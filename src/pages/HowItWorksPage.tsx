@@ -18,11 +18,11 @@ const HowItWorksPage = () => {
               Your Emotional Companion
             </span>
             <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
-              A safe space for your thoughts and feelings
+              A safe space to slow down and check in with yourself
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Moodly combines thoughtful journaling with gentle AI insights to help you 
-              understand and nurture your emotional wellbeing.
+              Reflectly is a simple place to write about how you're feeling. Some days you will have a lot to say. 
+              Other days maybe not. Either way, it's your space to pause, reflect and understand your emotions.
             </p>
             <Button variant="hero" size="xl" asChild>
               <Link to="/journal">Try It Free</Link>
@@ -67,8 +67,8 @@ const HowItWorksPage = () => {
                   Express How You Feel
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Choose from emoji-based moods and optional tags to quickly capture your emotional state. 
-                  No judgment, no pressure—just honest self-reflection at your own pace.
+                  Start by choosing a mood that matches what you're feeling at the moment. There are no rules.
+                  Sometimes you may have a lot to say, other days maybe not. Both are completely okay.
                 </p>
               </div>
             </div>
@@ -82,8 +82,9 @@ const HowItWorksPage = () => {
                   AI That Understands
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Our AI analyzes your entries with empathy. It recognizes emotional patterns, 
-                  detects sentiment shifts, and provides insights—all while respecting your privacy.
+                As you continue Journaling, Reflectly quietly looks for patterns in your enteries.
+                You might notice things like certain days feel heavier than others or moments where your mood slowly improves.
+                The insights are meant to help you understand yourself better, not to judge or analyze you.
                 </p>
               </div>
               <div className="glass-card p-8 order-1 md:order-2">
@@ -135,8 +136,9 @@ const HowItWorksPage = () => {
                   Actionable Suggestions
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Based on your mood, receive personalized suggestions: small tasks, reflection questions, 
-                  and calming activities. They're gentle, optional, and designed to support—not overwhelm.
+                  Sometimes when we are overwhelmed, it's hard to know what might help.
+                  Reflectly suggests small things that you can try. Maybe a short reflection question, a calming 
+                  exercise, or simply a reminder to pause and breathe. 
                 </p>
               </div>
             </div>
@@ -153,8 +155,8 @@ const HowItWorksPage = () => {
               Your Privacy Comes First
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Your journal is private. No ads, no data selling, no social sharing. 
-              Export or delete your data anytime—you're always in control.
+              Your journal is yours and yours alone. No ads. No data selling. No public sharing.
+              Everything you write stays private.
             </p>
             <Button variant="hero-outline" size="lg" asChild>
               <Link to="/journal">Start Your Private Journal</Link>
