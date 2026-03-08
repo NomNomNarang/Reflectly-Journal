@@ -158,9 +158,14 @@ const HowItWorksPage = () => {
               Your journal is yours and yours alone. No ads. No data selling. No public sharing.
               Everything you write stays private.
             </p>
+            
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Some days will be messy. Some days will feel peaceful. Reflectly is here for all of them.
+            </p>
             <Button variant="hero-outline" size="lg" asChild>
-              <Link to="/journal">Start Your Private Journal</Link>
+              <Link to="/journal">Begin your reflection</Link>
             </Button>
+            
           </div>
         </section>
       </main>
