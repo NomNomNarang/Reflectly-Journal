@@ -37,7 +37,7 @@ const Navbar = () => {
             to="/journal"
             className="px-5 py-2 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-all hover:scale-105 shadow-md shadow-primary/20"
           >
-            Start Journaling
+            Start writing
           </Link>
         </div>
       </div>

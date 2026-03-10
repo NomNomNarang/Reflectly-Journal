@@ -4,7 +4,7 @@ const steps = [
   {
     icon: BookOpen,
     title: "Check In Daily",
-    description: "Select your mood and jot down your thoughts in seconds.",
+    description: "Write freely about what you're feeling, whether it's something small or something that's been weighing on your mind. ",
     color: "from-lavender to-lavender-deep",
   },
   {
@@ -32,14 +32,12 @@ const HowItWorks = () => {
     <section className="py-20 px-4 bg-gradient-to-b from-transparent to-muted/30">
       <div className="container max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-4">
-            Simple & Effective
-          </span>
+          
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
             How Reflectly Works
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Your journey to emotional wellness, made simple and supportive.
+            Your space to pause, reflect, and grow.
           </p>
         </div>
 

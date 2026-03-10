@@ -14,9 +14,7 @@ const HowItWorksPage = () => {
         {/* Hero */}
         <section className="py-16 px-4 text-center">
           <div className="container max-w-4xl mx-auto">
-            <span className="inline-block px-4 py-1 rounded-full bg-secondary text-secondary-foreground text-sm font-medium mb-4">
-              Your Emotional Companion
-            </span>
+           
             <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-6">
               A safe space to slow down and check in with yourself
             </h1>

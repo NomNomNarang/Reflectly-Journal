@@ -17,19 +17,14 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Text content */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-in-up">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              AI-Powered Emotional Wellness
-            </div>
-            
+          
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 animate-fade-in-up-delay-1">
               Understand your emotions.{" "}
               <span className="text-gradient">One journal at a time.</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 animate-fade-in-up-delay-2">
-              Track your mood, reflect on your feelings, and receive gentle, 
-              personalized suggestions to nurture your mental wellbeing.
+              Reflect on your day, understand your emotions, and discover simple ways to take care of your mind.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up-delay-3">
