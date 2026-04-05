@@ -13,8 +13,8 @@ const moods: Mood[] = [
   { emoji: "😢", label: "Sad",      color: "mood-sad",     bgClass: "bg-mood-sad" },
   { emoji: "😰", label: "Anxious",  color: "mood-anxious", bgClass: "bg-mood-anxious" },
   { emoji: "😤", label: "Angry",    color: "mood-angry",   bgClass: "bg-mood-angry" },
-  { emoji: "😲", label: "Surprise", color: "mood-excited", bgClass: "bg-mood-excited" },
-  { emoji: "🥰", label: "Love",     color: "mood-calm",    bgClass: "bg-mood-calm" },
+  { emoji: "😲", label: "Surprise", color: "mood-excited", bgClass: "bg-mood-calm" },
+  { emoji: "❤️", label: "Love",     color: "mood-calm",    bgClass: "bg-mood-excited" },
   // { emoji: "😌", label: "Calm",     color: "mood-calm",    bgClass: "bg-mood-calm" },
 ];
 

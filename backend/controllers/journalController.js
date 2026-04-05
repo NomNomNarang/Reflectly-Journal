@@ -1,7 +1,7 @@
 const JournalEntry = require('../models/JournalEntry');
 const { analyzeEmotion } = require('../services/mlService');
 
-// 🔥 MODEL → UI EMOTION MAPPING
+// Emotion mapping
 const modelToUIEmotionMap = {
   anger: 'Angry',
   fear: 'Anxious',
@@ -11,7 +11,6 @@ const modelToUIEmotionMap = {
   surprise: 'Surprise',
 };
 
-// 🧠 Calm keywords (for smart detection)
 const calmKeywords = [
   'calm',
   'peaceful',
@@ -24,101 +23,165 @@ const calmKeywords = [
   'at ease',
 ];
 
-// POST /api/journal
+const CONFIDENCE_THRESHOLD = 0.5;
+
+// 🔥 UPDATED SMART HELPER FUNCTION
+const resolveUIEmotion = (rawEmotion, confidence, textInput, top3 = []) => {
+  const text = textInput.toLowerCase();
+
+  // ✅ LOVE override (strong semantic signals)
+  if (
+    text.includes('love') ||
+    text.includes('miss') ||
+    text.includes('hug') ||
+    text.includes('family') ||
+    text.includes('parents') ||
+    text.includes('friend') ||
+    text.includes('care')
+  ) {
+    return 'Love';
+  }
+
+  // ✅ SURPRISE override
+  if (
+    text.includes('surprise') ||
+    text.includes('unexpected') ||
+    text.includes('suddenly') ||
+    text.includes('shock') ||
+    text.includes('wow')
+  ) {
+    return 'Surprise';
+  }
+
+  // ✅ Use top3 fallback (VERY POWERFUL)
+  if (top3 && top3.length > 1) {
+    const second = top3[1];
+
+    if (second?.raw === 'love' && second.confidence > 0.05) {
+      return 'Love';
+    }
+
+    if (second?.raw === 'surprise' && second.confidence > 0.05) {
+      return 'Surprise';
+    }
+  }
+
+  // ✅ Calm logic
+  if (confidence < CONFIDENCE_THRESHOLD || rawEmotion === 'uncertain') {
+    return 'Calm';
+  }
+
+  // ✅ Smart calm for mild sadness
+  if (
+    rawEmotion === 'sadness' &&
+    confidence < 0.65 &&
+    calmKeywords.some((word) => text.includes(word))
+  ) {
+    return 'Calm';
+  }
+
+  return modelToUIEmotionMap[rawEmotion] || 'Calm';
+};
+
+// ─────────────────────────────────────────
+// CREATE ENTRY
+// ─────────────────────────────────────────
 exports.createEntry = async (req, res) => {
   try {
+    console.log("REQ.USER:", req.user);
+    console.log("REQ.BODY:", req.body);
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ msg: 'User not authenticated properly' });
+    }
+
     const { text, tags } = req.body;
 
     if (!text || !text.trim()) {
       return res.status(400).json({ msg: 'Journal text is required' });
     }
 
+    const textInput = text.trim().toLowerCase();
+
     let emotionData;
-
     try {
-      emotionData = await analyzeEmotion(text.trim());
+      emotionData = await analyzeEmotion(textInput);
     } catch (mlErr) {
-      console.error('[journal/create] ML error:', mlErr.message);
-
-      // ✅ Safe fallback
+      console.error('[ML ERROR]', mlErr);
       emotionData = {
-        rawEmotion: 'sadness',
+        rawEmotion: 'uncertain',
         confidence: 0,
         top3: [],
+        uncertainty: 'high',
       };
     }
 
-    const rawEmotion = emotionData.rawEmotion;
-    const confidence = emotionData.confidence;
-    const textInput = text.toLowerCase();
+    const { rawEmotion, confidence, top3, uncertainty } = emotionData;
 
-    // 🔥 Base mapping
-    let mappedEmotion = modelToUIEmotionMap[rawEmotion];
+    // 🔥 UPDATED CALL (includes top3)
+    const mappedEmotion = resolveUIEmotion(
+      rawEmotion,
+      confidence,
+      textInput,
+      top3
+    );
 
-    // 🧠 SMART CALM DETECTION
-    if (
-      rawEmotion === 'sadness' &&
-      confidence < 0.6 &&
-      calmKeywords.some((word) => textInput.includes(word))
-    ) {
-      mappedEmotion = 'Calm';
-    }
-
-    // fallback safety
-    if (!mappedEmotion) {
-      console.warn('Unknown emotion:', rawEmotion);
-      mappedEmotion = 'Sad';
-    }
-
-    // 🔥 Save to DB
     const entry = await JournalEntry.create({
       userId: req.user.id,
       text: text.trim(),
       emotion: mappedEmotion,
-      rawEmotion: rawEmotion,
-      confidence: confidence,
+      rawEmotion,
+      confidence,
       tags: tags || [],
     });
 
-    // 🔍 Debug log
-    console.log({
-      input: text,
-      raw: rawEmotion,
-      mapped: mappedEmotion,
-      confidence,
-    });
+    console.log('✅ ENTRY SAVED:', entry._id);
 
     res.status(201).json({
       entry,
       emotion: mappedEmotion,
       rawEmotion,
       confidence,
-      top3: emotionData.top3,
+      uncertainty,
+      top3,
     });
 
   } catch (err) {
-    console.error('[journal/create]', err.message);
+    console.error('🔥 FULL JOURNAL ERROR:', err);
     res.status(500).json({ msg: 'Failed to save journal entry' });
   }
 };
 
-// GET /api/journal
+// ─────────────────────────────────────────
+// GET ENTRIES
+// ─────────────────────────────────────────
 exports.getEntries = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ msg: 'User not authenticated properly' });
+    }
+
     const entries = await JournalEntry.find({ userId: req.user.id })
       .sort({ createdAt: -1 })
       .limit(100);
 
     res.json(entries);
+
   } catch (err) {
-    console.error('[journal/list]', err.message);
+    console.error('🔥 FETCH ENTRIES ERROR:', err);
     res.status(500).json({ msg: 'Failed to fetch entries' });
   }
 };
 
-// GET /api/journal/dashboard
+// ─────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────
 exports.getDashboard = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ msg: 'User not authenticated properly' });
+    }
+
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
@@ -137,7 +200,9 @@ exports.getDashboard = async (req, res) => {
     entries.forEach((entry) => {
       const day = new Date(entry.createdAt).getDate();
       moodData[day] = entry.emotion;
-      moodCounts[entry.emotion] = (moodCounts[entry.emotion] || 0) + 1;
+
+      moodCounts[entry.emotion] =
+        (moodCounts[entry.emotion] || 0) + 1;
     });
 
     const total = entries.length || 1;
@@ -150,7 +215,6 @@ exports.getDashboard = async (req, res) => {
       }))
       .sort((a, b) => b.count - a.count);
 
-    // 🔥 Streak calculation
     const entriesByDay = new Set(
       entries.map((e) => new Date(e.createdAt).toDateString())
     );
@@ -166,12 +230,14 @@ exports.getDashboard = async (req, res) => {
     res.json({ moodData, weeklyStats, streak });
 
   } catch (err) {
-    console.error('[journal/dashboard]', err.message);
+    console.error('🔥 DASHBOARD ERROR:', err);
     res.status(500).json({ msg: 'Failed to fetch dashboard data' });
   }
 };
 
-// POST /api/journal/analyze (preview only)
+// ─────────────────────────────────────────
+// ANALYZE ONLY
+// ─────────────────────────────────────────
 exports.analyzeOnly = async (req, res) => {
   try {
     const { text } = req.body;
@@ -180,18 +246,34 @@ exports.analyzeOnly = async (req, res) => {
       return res.status(400).json({ msg: 'text is required' });
     }
 
-    const result = await analyzeEmotion(text.trim());
+    const textInput = text.trim().toLowerCase();
 
-    const mappedEmotion =
-      modelToUIEmotionMap[result.rawEmotion] || 'Sad';
+    let result;
+    try {
+      result = await analyzeEmotion(textInput);
+    } catch (err) {
+      return res.status(503).json({ msg: 'ML service unavailable' });
+    }
+
+    const { rawEmotion, confidence, top3, uncertainty } = result;
+
+    const mappedEmotion = resolveUIEmotion(
+      rawEmotion,
+      confidence,
+      textInput,
+      top3
+    );
 
     res.json({
-      ...result,
+      rawEmotion,
+      confidence,
+      top3,
+      uncertainty,
       emotion: mappedEmotion,
     });
 
   } catch (err) {
-    console.error('[journal/analyze]', err.message);
+    console.error('🔥 ANALYZE ERROR:', err);
     res.status(503).json({ msg: err.message });
   }
 };

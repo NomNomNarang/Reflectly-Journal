@@ -1,82 +1,98 @@
 const mongoose = require('mongoose');
 
-// ✅ Allowed UI emotions (INCLUDING Calm)
+console.log("✅ JournalEntry model loaded");
+
+// ✅ Allowed UI emotions
 const UI_EMOTIONS = [
-  'Happy',     // joy
-  'Sad',       // sadness
-  'Anxious',   // fear
-  'Angry',     // anger
-  'Surprise',  // surprise
-  'Love',      // love
-  'Calm'       // 🔥 added (derived emotion)
+  'Happy',
+  'Sad',
+  'Anxious',
+  'Angry', 
+  'Surprise',
+  'Love',
+  'Calm',
 ];
 
-// ✅ Raw ML model emotions (DO NOT CHANGE)
+// ✅ Raw ML emotions
 const RAW_EMOTIONS = [
   'anger',
   'fear',
   'joy',
   'love',
   'sadness',
-  'surprise'
+  'surprise',
+  'uncertain',
 ];
 
-const journalEntrySchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true,
-  },
+// ✅ Uncertainty levels
+const UNCERTAINTY_LEVELS = ['low', 'moderate', 'high'];
 
-  text: {
-    type: String,
-    required: [true, 'Journal text is required'],
-    trim: true,
-    minlength: [3, 'Text must be at least 3 characters long'],
-  },
+const journalEntrySchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
 
-  // ✅ UI-friendly emotion (mapped in controller)
-  emotion: {
-    type: String,
-    enum: UI_EMOTIONS,
-    required: true,
-  },
+    text: {
+      type: String,
+      required: [true, 'Journal text is required'],
+      trim: true,
+      minlength: [3, 'Text must be at least 3 characters long'],
+    },
 
-  // ✅ Raw ML output (strict)
-  rawEmotion: {
-    type: String,
-    enum: RAW_EMOTIONS,
-    required: true,
-  },
+    emotion: {
+      type: String,
+      enum: UI_EMOTIONS,
+      required: true,
+      default: 'Calm',
+    },
 
-  // ✅ Model confidence score
-  confidence: {
-    type: Number,
-    min: 0,
-    max: 1,
-    default: 0,
-  },
+    rawEmotion: {
+      type: String,
+      enum: RAW_EMOTIONS,
+      default: 'uncertain',
+    },
 
-  // ✅ Optional tags
-  tags: {
-    type: [String],
-    default: [],
-  },
+    confidence: {
+      type: Number,
+      min: 0,
+      max: 1,
+      default: 0,
+    },
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    index: true,
-  },
-});
+    uncertainty: {
+      type: String,
+      enum: UNCERTAINTY_LEVELS,
+      default: 'high',
+    },
 
-// 🔥 Optional: prevent duplicate empty entries
-journalEntrySchema.pre('save', function (next) {
-  if (!this.text || !this.text.trim()) {
-    return next(new Error('Journal text cannot be empty'));
+    top3: {
+      type: Array,
+      default: [],
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
   }
-  next();
-});
+);
 
-module.exports = mongoose.model('JournalEntry', journalEntrySchema);
+// ✅ SAFE PRE-SAVE VALIDATION (no async, so next is valid)
+// journalEntrySchema.pre('save', function (next) {
+//   if (!this.text || !this.text.trim()) {
+//     return next(new Error('Journal text cannot be empty'));
+//   }
+//   next();
+// });
+
+// ✅ PREVENT MODEL OVERWRITE ERROR (IMPORTANT)
+module.exports =
+  mongoose.models.JournalEntry ||
+  mongoose.model('JournalEntry', journalEntrySchema);

@@ -33,3 +33,4 @@ ml-service/emotion_model_final/
 *.pt
 *.safetensors
 *.pkl
+.env

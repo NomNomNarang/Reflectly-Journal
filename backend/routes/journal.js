@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+
 const auth = require('../middleware/auth');
+
 const {
   createEntry,
   getEntries,
@@ -8,13 +10,25 @@ const {
   analyzeOnly,
 } = require('../controllers/journalController');
 
-// All routes require a valid JWT
-router.post('/', auth, createEntry);           // POST  /api/journal        — submit entry
-router.get('/', auth, getEntries);             // GET   /api/journal        — list history
-router.get('/dashboard', auth, getDashboard);  // GET   /api/journal/dashboard — stats + calendar
-router.post('/analyze', auth, analyzeOnly);    // POST  /api/journal/analyze  — preview only
+// ─────────────────────────────────────────
+// 🔐 All routes require authentication
+// ─────────────────────────────────────────
 
-// Legacy alias kept for backward compat with earlier frontend code
-router.get('/dashboard', auth, getDashboard);  // also served at /api/entries/dashboard via server.js
+// POST   /api/journal          → create new entry
+router.post('/', auth, createEntry);
+
+// GET    /api/journal          → fetch all entries
+router.get('/', auth, getEntries);
+
+// GET    /api/journal/dashboard → dashboard stats
+router.get('/dashboard', auth, getDashboard);
+
+// POST   /api/journal/analyze  → analyze without saving
+router.post('/analyze', auth, analyzeOnly);
+
+// ─────────────────────────────────────────
+// Legacy support
+// (handled via server.js alias /api/entries)
+// ─────────────────────────────────────────
 
 module.exports = router;

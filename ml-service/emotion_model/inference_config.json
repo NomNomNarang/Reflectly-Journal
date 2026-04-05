@@ -1,0 +1,29 @@
+{
+  "base_model": "roberta-base",
+  "loss": "WeightedCrossEntropyLoss",
+  "class_weights": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "optimizer": "AdamW(lr=2e-5, weight_decay=0.01)",
+  "scheduler": "LinearWarmup(warmup_ratio=0.1)",
+  "epochs": 5,
+  "batch_size": 16,
+  "max_length": 128,
+  "confidence_threshold": 0.5,
+  "lexicon_weight": 0.3,
+  "temperature": 1.623352,
+  "num_labels": 6,
+  "labels": [
+    "anger",
+    "fear",
+    "joy",
+    "love",
+    "sadness",
+    "surprise"
+  ]
+}
