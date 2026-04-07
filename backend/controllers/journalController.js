@@ -1,44 +1,39 @@
 const JournalEntry = require('../models/JournalEntry');
 const { analyzeEmotion } = require('../services/mlService');
+const { generateInsight } = require('../services/insightService'); // ✅ NEW
 
+// ─────────────────────────────────────────
 // Emotion mapping
+// ─────────────────────────────────────────
 const modelToUIEmotionMap = {
-  anger: 'Angry',
-  fear: 'Anxious',
-  joy: 'Happy',
-  love: 'Love',
-  sadness: 'Sad',
+  anger:    'Angry',
+  fear:     'Anxious',
+  joy:      'Happy',
+  love:     'Love',
+  sadness:  'Sad',
   surprise: 'Surprise',
 };
 
 const calmKeywords = [
-  'calm',
-  'peaceful',
-  'relaxed',
-  'chill',
-  'fine',
-  'okay',
-  'ok',
-  'content',
-  'at ease',
+  'calm', 'peaceful', 'relaxed', 'chill',
+  'fine', 'okay', 'ok', 'content', 'at ease',
 ];
 
-const CONFIDENCE_THRESHOLD = 0.5;
+const CONFIDENCE_THRESHOLD = 0.3;
 
-// 🔥 UPDATED SMART HELPER FUNCTION
+// ─────────────────────────────────────────
+// 🔥 SMART HELPER — unchanged from your version
+// ─────────────────────────────────────────
 const resolveUIEmotion = (rawEmotion, confidence, textInput, top3 = []) => {
   const text = textInput.toLowerCase();
 
-  // ✅ LOVE override (strong semantic signals)
+  // ✅ LOVE override
   if (
-    text.includes('love') ||
-    text.includes('miss') ||
-    text.includes('hug') ||
-    text.includes('family') ||
-    text.includes('parents') ||
-    text.includes('friend') ||
-    text.includes('care')
-  ) {
+  text.includes('i love') ||
+  text.includes('love you') ||
+  text.includes('in love') ||
+  text.includes('so much love')
+) {
     return 'Love';
   }
 
@@ -53,20 +48,14 @@ const resolveUIEmotion = (rawEmotion, confidence, textInput, top3 = []) => {
     return 'Surprise';
   }
 
-  // ✅ Use top3 fallback (VERY POWERFUL)
+  // ✅ top3 fallback
   if (top3 && top3.length > 1) {
     const second = top3[1];
-
-    if (second?.raw === 'love' && second.confidence > 0.05) {
-      return 'Love';
-    }
-
-    if (second?.raw === 'surprise' && second.confidence > 0.05) {
-      return 'Surprise';
-    }
+    if (second?.raw === 'love' && second.confidence > 0.05)     return 'Love';
+    if (second?.raw === 'surprise' && second.confidence > 0.05) return 'Surprise';
   }
 
-  // ✅ Calm logic
+  // ✅ Calm fallback
   if (confidence < CONFIDENCE_THRESHOLD || rawEmotion === 'uncertain') {
     return 'Calm';
   }
@@ -103,47 +92,61 @@ exports.createEntry = async (req, res) => {
 
     const textInput = text.trim().toLowerCase();
 
+    // ── Step 1: Detect emotion ─────────────────────────────────────
     let emotionData;
     try {
       emotionData = await analyzeEmotion(textInput);
     } catch (mlErr) {
       console.error('[ML ERROR]', mlErr);
       emotionData = {
-        rawEmotion: 'uncertain',
-        confidence: 0,
-        top3: [],
+        rawEmotion:  'uncertain',
+        confidence:  0,
+        top3:        [],
         uncertainty: 'high',
       };
     }
 
     const { rawEmotion, confidence, top3, uncertainty } = emotionData;
+    const mappedEmotion = resolveUIEmotion(rawEmotion, confidence, textInput, top3);
 
-    // 🔥 UPDATED CALL (includes top3)
-    const mappedEmotion = resolveUIEmotion(
-      rawEmotion,
-      confidence,
-      textInput,
-      top3
-    );
+    // ── Step 2: Generate Groq insight ──────────────────────────────
+    // ✅ NEW: uses original text (not lowercased) for better Groq output
+    let insight = null;
+    try {
+      insight = await generateInsight(
+        text.trim(),    // original casing — better for Groq
+        rawEmotion,
+        mappedEmotion,
+        confidence
+      );
+    } catch (grokErr) {
+      console.error('[GROQ ERROR]', grokErr.message);
+      // insight stays null — frontend falls back to static suggestions
+    }
 
+    // ── Step 3: Save entry ─────────────────────────────────────────
     const entry = await JournalEntry.create({
-      userId: req.user.id,
-      text: text.trim(),
-      emotion: mappedEmotion,
-      rawEmotion,
-      confidence,
-      tags: tags || [],
-    });
-
-    console.log('✅ ENTRY SAVED:', entry._id);
-
-    res.status(201).json({
-      entry,
-      emotion: mappedEmotion,
+      userId:      req.user.id,
+      text:        text.trim(),
+      emotion:     mappedEmotion,
       rawEmotion,
       confidence,
       uncertainty,
       top3,
+      insight,     // ✅ NEW: save Groq insight to DB
+      tags:        tags || [],
+    });
+
+    console.log('✅ ENTRY SAVED:', entry._id, '| insight:', !!insight);
+
+    res.status(201).json({
+      entry,
+      emotion:     mappedEmotion,
+      rawEmotion,
+      confidence,
+      uncertainty,
+      top3,
+      insight,     // ✅ NEW: send to frontend
     });
 
   } catch (err) {
@@ -182,27 +185,25 @@ exports.getDashboard = async (req, res) => {
       return res.status(401).json({ msg: 'User not authenticated properly' });
     }
 
-    const now = new Date();
-    const year = now.getFullYear();
+    const now   = new Date();
+    const year  = now.getFullYear();
     const month = now.getMonth();
 
     const startOfMonth = new Date(year, month, 1);
-    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
+    const endOfMonth   = new Date(year, month + 1, 0, 23, 59, 59);
 
     const entries = await JournalEntry.find({
-      userId: req.user.id,
+      userId:    req.user.id,
       createdAt: { $gte: startOfMonth, $lte: endOfMonth },
     }).sort({ createdAt: 1 });
 
-    const moodData = {};
+    const moodData   = {};
     const moodCounts = {};
 
     entries.forEach((entry) => {
       const day = new Date(entry.createdAt).getDate();
       moodData[day] = entry.emotion;
-
-      moodCounts[entry.emotion] =
-        (moodCounts[entry.emotion] || 0) + 1;
+      moodCounts[entry.emotion] = (moodCounts[entry.emotion] || 0) + 1;
     });
 
     const total = entries.length || 1;
@@ -219,8 +220,8 @@ exports.getDashboard = async (req, res) => {
       entries.map((e) => new Date(e.createdAt).toDateString())
     );
 
-    let streak = 0;
-    const check = new Date();
+    let streak    = 0;
+    const check   = new Date();
 
     while (entriesByDay.has(check.toDateString())) {
       streak++;
@@ -256,13 +257,20 @@ exports.analyzeOnly = async (req, res) => {
     }
 
     const { rawEmotion, confidence, top3, uncertainty } = result;
+    const mappedEmotion = resolveUIEmotion(rawEmotion, confidence, textInput, top3);
 
-    const mappedEmotion = resolveUIEmotion(
-      rawEmotion,
-      confidence,
-      textInput,
-      top3
-    );
+    // ✅ NEW: also generate insight on analyze preview
+    let insight = null;
+    try {
+      insight = await generateInsight(
+        text.trim(),
+        rawEmotion,
+        mappedEmotion,
+        confidence
+      );
+    } catch (grokErr) {
+      console.error('[GROQ ERROR analyzeOnly]', grokErr.message);
+    }
 
     res.json({
       rawEmotion,
@@ -270,6 +278,7 @@ exports.analyzeOnly = async (req, res) => {
       top3,
       uncertainty,
       emotion: mappedEmotion,
+      insight, // ✅ NEW
     });
 
   } catch (err) {

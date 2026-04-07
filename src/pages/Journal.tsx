@@ -7,12 +7,13 @@ import AISuggestions from "@/components/AISuggestions";
 const API = "http://localhost:4000";
 
 const Journal = () => {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [journalEntry, setJournalEntry] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [selectedTags, setSelectedTags]     = useState<string[]>([]);
+  const [journalEntry, setJournalEntry]     = useState("");
+  const [isAnalyzing, setIsAnalyzing]       = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [detectedMood, setDetectedMood] = useState("Calm");
-  const [error, setError] = useState("");
+  const [detectedMood, setDetectedMood]     = useState("Calm");
+  const [error, setError]                   = useState("");
+  const [insight, setInsight]               = useState<string | null>(null); // ✅ NEW
 
   const handleSubmit = async () => {
     if (!journalEntry.trim()) return;
@@ -37,14 +38,20 @@ const Journal = () => {
       }
 
       const data = await res.json();
-      // data.emotion is the UI-facing label: Happy | Sad | Anxious | Angry | Excited | Calm
+
+      // ✅ Set mood from ML model
       setDetectedMood(data.emotion || "Calm");
+
+      // ✅ NEW: set Groq insight (null if Groq was unavailable)
+      setInsight(data.insight || null);
+
       setShowSuggestions(true);
     } catch (err: any) {
       console.error("[Journal submit]", err);
       setError(err.message || "Something went wrong. Please try again.");
-      // Still show suggestions with neutral mood so UX isn't blocked
+      // Still show suggestions so UX isn't blocked
       setDetectedMood("Calm");
+      setInsight(null);
       setShowSuggestions(true);
     } finally {
       setIsAnalyzing(false);
@@ -57,6 +64,7 @@ const Journal = () => {
     setShowSuggestions(false);
     setError("");
     setDetectedMood("Calm");
+    setInsight(null); // ✅ NEW: reset insight on new entry
   };
 
   return (
@@ -108,6 +116,7 @@ const Journal = () => {
             <AISuggestions
               mood={detectedMood}
               tags={selectedTags}
+              insight={insight}       // ✅ NEW: pass Groq insight
               onNewEntry={handleNewEntry}
             />
           )}

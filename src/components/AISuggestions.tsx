@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lightbulb, Heart, RefreshCw } from "lucide-react";
+import { CheckCircle, Lightbulb, Heart, RefreshCw, Sparkles } from "lucide-react";
 
 interface AISuggestionsProps {
   mood: string;
   tags: string[];
+  insight: string | null; // ✅ NEW: personalized Groq insight
   onNewEntry: () => void;
 }
 
@@ -70,12 +71,13 @@ const moodSuggestions: Record<string, { task: string; question: string; activity
   },
 };
 
-const AISuggestions = ({ mood, tags, onNewEntry }: AISuggestionsProps) => {
+const AISuggestions = ({ mood, tags, insight, onNewEntry }: AISuggestionsProps) => {
   const suggestions = moodSuggestions[mood] || moodSuggestions.neutral;
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      {/* Analysis Summary */}
+
+      {/* ── Analysis Summary ── */}
       <div className="glass-card p-8 text-center">
         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-lavender to-mint flex items-center justify-center">
           <Heart className="w-10 h-10 text-primary" />
@@ -83,10 +85,27 @@ const AISuggestions = ({ mood, tags, onNewEntry }: AISuggestionsProps) => {
         <h2 className="font-serif text-2xl font-bold text-foreground mb-3">
           {suggestions.message}
         </h2>
-        <p className="text-muted-foreground">
-          Based on your check-in, here are some gentle suggestions for you.
-        </p>
-        
+
+        {/* ✅ NEW: Groq personalized insight — shown if available */}
+        {insight ? (
+          <div className="mt-4 mb-2 p-4 rounded-2xl bg-gradient-to-br from-lavender/20 to-mint/20 border border-primary/10">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                Personalized Insight
+              </span>
+            </div>
+            <p className="text-foreground text-sm leading-relaxed italic">
+              {insight}
+            </p>
+          </div>
+        ) : (
+          // ✅ Fallback if Groq is unavailable
+          <p className="text-muted-foreground">
+            Based on your check-in, here are some gentle suggestions for you.
+          </p>
+        )}
+
         {tags.length > 0 && (
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {tags.map((tag) => (
@@ -101,7 +120,7 @@ const AISuggestions = ({ mood, tags, onNewEntry }: AISuggestionsProps) => {
         )}
       </div>
 
-      {/* Suggestions Grid */}
+      {/* ── Suggestions Grid (always shown) ── */}
       <div className="grid md:grid-cols-3 gap-6">
         <div className="glass-card p-6 hover:scale-105 transition-all duration-300">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-lavender to-lavender-deep flex items-center justify-center mb-4">
@@ -134,7 +153,7 @@ const AISuggestions = ({ mood, tags, onNewEntry }: AISuggestionsProps) => {
         </div>
       </div>
 
-      {/* Actions */}
+      {/* ── Actions ── */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
         <Button variant="hero" size="lg" onClick={onNewEntry}>
           <RefreshCw className="w-4 h-4 mr-2" />

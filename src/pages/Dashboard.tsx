@@ -12,7 +12,7 @@ const moodColors: Record<string, string> = {
   Angry:    "bg-mood-angry",
   Surprise: "bg-mood-calm",
   Love:     "bg-mood-excited",
-  // Calm:     "bg-mood-calm",
+  Calm:     "bg-mood-tired",
   // Tired:    "bg-mood-tired",
   // Excited:  "bg-mood-excited",
 };
@@ -24,7 +24,7 @@ const moodEmoji: Record<string, string> = {
   Angry:    "😤",
   Surprise: "😲",
   Love:     "❤️",
-  // Calm:     "😌",
+  Calm:     "😌",
   // Tired:    "😴",
   // Excited:  "🤩",
 };
