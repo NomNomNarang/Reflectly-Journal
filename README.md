@@ -1,117 +1,86 @@
+# 🌸 Reflectly  
+### *Understand your emotions. One journal at a time.*
 
-🌸 Reflectly – AI-Powered Emotion-Aware Journaling
-<p align="center"> <img src="https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif" width="250"/> </p>
+---
 
-“Write your thoughts. Understand your emotions. Grow a little every day.” 🌿
+## 💭 Overview
 
-💭 Overview
+Reflectly is an AI-powered journaling platform that helps users understand their emotions through text.  
+It combines deep learning with uncertainty-aware predictions to provide more reliable and meaningful emotional insights.
 
-Reflectly is an AI-powered journaling application that helps users understand their emotions through text.
-Instead of just storing thoughts, it analyzes emotional patterns, provides feedback, and makes journaling more meaningful and self-aware.
+---
 
-This project combines:
+## ✨ Features
 
-🤖 Deep Learning (RoBERTa)
-📊 Uncertainty-aware predictions
-🧠 Hybrid emotion reasoning (NRCLex)
-🌐 Full-stack deployment
-✨ Features
+- 🧠 Emotion detection from journal entries  
+- 📊 Mood tracking and insights  
+- 🔒 Privacy-focused journaling  
+- ⚡ Real-time predictions  
+- 📈 Streak and activity tracking  
+- 🌿 Hybrid AI + lexicon-based reasoning  
 
-🌸 Emotion Detection from journal entries
-🌿 Confidence-aware predictions (no blind guessing)
-📊 Mood tracking over time
-🔥 Streak tracking for consistency
-🧠 Hybrid AI + lexicon reasoning
-⚡ Real-time predictions using FastAPI
-💾 MongoDB-based storage
+---
 
-🧠 How It Works
-<p align="center"> <img src="https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif" width="300"/> </p>
-User writes a journal entry ✍️
-Text is sent to backend
-Model predicts emotion using RoBERTa
-Confidence is calibrated (temperature scaling)
-Uncertainty is analyzed
-If confidence is low → NRCLex fusion applied
-Final emotion is returned
-🏗️ Tech Stack
-🔹 Frontend
-React.js
-🔹 Backend
-Node.js + Express
-MongoDB
-🔹 ML Inference
-FastAPI
-HuggingFace Transformers
-PyTorch
-⚙️ Model Details
-Model: RoBERTa-base
-Classes: anger, fear, joy, love, sadness, surprise
-F1 Score: 0.9560
-Calibration: Temperature Scaling
-ECE Reduced: 0.0342 → 0.0145
-🔍 Key Concepts Used
+## 🖼️ Application Preview
 
-🌱 Calibration (Temperature Scaling)
-Improves reliability of predictions
+### 🏠 Landing Page
+![Landing Page](./assets/landing.jpeg)
 
-🌼 Uncertainty Estimation
-MSP (confidence)
-Entropy (ambiguity)
+---
 
-🌸 Hybrid Fusion (NRCLex)
-Used when model is unsure
+### ✍️ Journaling Interface
+![Journal](./assets/journal.jpeg)
 
-📊 System Architecture
-<p align="center"> <img src="your_system_architecture.png" width="700"/> </p>
-📸 UI Preview
-<p align="center"> <img src="your_ui_screenshot.png" width="500"/> </p>
-🚀 Setup Instructions
-1. Clone the repository
-git clone https://github.com/your-username/reflectly.git
-cd reflectly
-2. Backend setup
-cd backend
-npm install
-npm start
-3. ML Service
-cd ml-service
-pip install -r requirements.txt
-uvicorn app:app --reload
-4. Frontend
-cd frontend
-npm install
-npm start
-📁 Project Structure
-Reflectly/
-│
-├── frontend/        # React UI
-├── backend/         # Node.js server
-├── ml-service/      # FastAPI + model
-├── models/          # Saved model + tokenizer
-└── notebooks/       # Training + experiments
-🌷 Why This Project Matters
+---
 
-Mental health tools often:
-❌ ignore uncertainty
-❌ give overconfident outputs
+### 📊 Mood Dashboard
+![Dashboard](./assets/Moodjourney.jpeg)
 
-Reflectly solves this by:
-✅ showing reliable predictions
-✅ handling ambiguity
-✅ combining AI with human-like reasoning
-🌼 Future Improvements
-Multi-label emotion detection
-Personal emotion trends
-Better recommendation system
-Mobile app version 📱
-🤍 A Small Note
-<p align="center"> <img src="https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif" width="250"/> </p>
+---
 
-Take care of your mind the same way you take care of everything else.
-Even writing one line a day matters 🌿
+## 🏗️ System Architecture
 
-⭐ If you like this project
+![System Architecture](./assets/SystemArch.png)
 
-Give it a star ⭐
-It helps more than you think!
+---
+
+## ⚙️ Tech Stack
+
+| Layer            | Technology Used |
+|----------------|---------------|
+| Frontend        | React.js      |
+| Backend         | Node.js, Express |
+| Database        | MongoDB       |
+| ML Service      | FastAPI       |
+| Model           | RoBERTa (HuggingFace) |
+| Framework       | PyTorch       |
+
+---
+
+## 🧠 Model Details
+
+| Component              | Description |
+|----------------------|------------|
+| Model                 | RoBERTa-base |
+| Classes               | Anger, Fear, Joy, Love, Sadness, Surprise |
+| F1 Score              | **0.9560** |
+| Calibration           | Temperature Scaling |
+| ECE (Before → After)  | 0.0342 → 0.0145 |
+| Uncertainty Measures  | MSP + Entropy |
+| Fusion Method         | NRCLex Hybrid |
+
+---
+
+## 🔍 How It Works
+
+1. User writes a journal entry  
+2. Text is sent to backend  
+3. RoBERTa predicts emotion  
+4. Calibration improves confidence reliability  
+5. Uncertainty is calculated  
+6. If confidence is low → NRCLex fusion applied  
+7. Final emotion is returned to user  
+
+---
+
+## 📁 Project Structure
