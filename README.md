@@ -165,11 +165,19 @@ npm start
 
 ---
 
-## 🌷Contributing
-Contributions are welcome 🌿
-Steps:
-Fork the repository
-Create a new branch
-Make changes
-Commit and push
-Open a Pull Request
+---
+
+## 💛 Final Note
+
+This project is built with the idea that understanding your emotions should feel natural, not overwhelming.
+
+Reflectly doesn’t aim to replace human understanding it simply helps you notice patterns, reflect a little deeper, and be more aware of your own thoughts.
+
+---
+
+<div align="center">
+
+✨ *Built with care. Designed for reflection.* ✨  
+
+</div>
+
