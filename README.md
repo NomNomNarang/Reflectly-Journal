@@ -34,21 +34,17 @@ The goal is not to label your feelings, but to help you notice patterns over tim
 ## 🖼️ Application Preview
 
 ### 🏠 Landing Page
-<img src="Dashboard.jpeg" width="700" height="400"/>
+<img src="Dashboard.jpeg" width="400" height="400"/>
 
 ### ✍️ Journal Entry
-![Journal Entry])
-<img src="journal.jpeg" width="700" height="400"/>
+<img src="journal.jpeg" width="400" height="400"/>
 
 ### 📊 Mood Journey
-![Mood Journey]
-<img src="Moodjourney.jpeg" width="700" height="400"/>
+<img src="Moodjourney.jpeg" width="400" height="400"/>
 
 
 ## 🏗️ System Architecture
-
-![System Architecture]
-<img src="SystemArch.png" width="700" height="400"/>
+<img src="SystemArch.png" width="400" height="400"/>
 
 The system separates concerns across three layers:
 
