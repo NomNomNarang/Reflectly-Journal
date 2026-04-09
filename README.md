@@ -117,3 +117,51 @@ The final emotion label and confidence are stored with the journal entry. The fr
 ---
 
 ## 📁 Project Structure
+reflectly/
+├── client/
+├── server/
+├── ml-service/
+├── assets/
+└── README.md
+
+
+---
+
+## 🚀 Setup Instructions
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/reflectly.git
+cd reflectly
+```
+---
+
+## 🎰Backend
+cd backend
+npm install
+npm start
+
+---
+
+## 🎰ML Service
+cd ml-service
+pip install -r requirements.txt
+uvicorn app:app --reload
+
+---
+
+## 🎰Frontend
+cd frontend
+npm install
+npm start
+
+---
+
+## 🌷Contributing
+Contributions are welcome 🌿
+Steps:
+Fork the repository
+Create a new branch
+Make changes
+Commit and push
+Open a Pull Request
