@@ -117,12 +117,14 @@ The final emotion label and confidence are stored with the journal entry. The fr
 ---
 
 ## 📁 Project Structure
+```bash
 reflectly/
 ├── client/
 ├── server/
 ├── ml-service/
 ├── assets/
 └── README.md
+```
 
 
 ---
